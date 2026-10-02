@@ -8,6 +8,12 @@
 <meta name="description" content="A practical afternoon for brothers in Tetouan, whether you're starting out or already have clients. Saturday 10 October.">
 <meta property="og:title" content="Tetouan Business Mastermind · Saturday 10 October">
 <meta property="og:description" content="Get paid what your skills are worth. A practical afternoon for brothers in Tetouan. Limited seats.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://onlineactivities7801-svg.github.io/Tetouan-mastermind/">
+<meta property="og:image" content="https://onlineactivities7801-svg.github.io/Tetouan-mastermind/video-thumbnail.jpg">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="720">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0A1426">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230A1426'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23D9AE55' font-family='Georgia,serif'>T</text></svg>">
 <script async src="https://tally.so/widgets/embed.js"></script>
@@ -546,12 +552,12 @@ a[data-link="whatsapp"]:not(.ghost):not(.btn){display:inline-block}
           <a class="btn" href="#book">Reserve your seat</a>
         </div>
         <div class="step">
-          <h3>Pay 250 MAD <span class="usd">(about $25)</span></h3>
-          <p>Right after step 1 you can choose Wise, Revolut or cash. Covered by our money-back promise.</p>
+          <h3>Watch the video and fill in the form</h3>
+          <p>Answer a few questions and tick that you agree to pay 250 MAD to save your spot.</p>
         </div>
         <div class="step">
-          <h3>Finish your registration</h3>
-          <p>Watch the video and fill in a short form with a few questions. Once your payment is in, Brother Fawad confirms your seat on WhatsApp, adds you to the group and sends the venue details.</p>
+          <h3>Pay 250 MAD <span class="usd">(about $25)</span></h3>
+          <p>Right after the form, choose Wise, Revolut or cash. Once your payment is in, Brother Fawad confirms your seat on WhatsApp, adds you to the group and sends the venue details. Covered by our money-back promise.</p>
         </div>
       </div>
     </section>
@@ -620,33 +626,46 @@ a[data-link="whatsapp"]:not(.ghost):not(.btn){display:inline-block}
 <div class="sticky" id="sticky"><a class="btn" href="#book">Reserve your seat · 250 MAD</a></div>
 
 
-<!-- RESERVE FLOW: step 2 (payment) -->
-<div class="ov" id="payOv" role="dialog" aria-modal="true" aria-labelledby="payTitle" tabindex="-1">
-  <div class="ov-card">
-    <button class="ov-x" type="button" data-close="payOv" aria-label="Close">&times;</button>
-    <p class="label">Step 2 of 3</p>
-    <h2 id="payTitle">Pay 250 MAD to secure your seat</h2>
-    <p>Thank you<span id="payName"></span>. Choose whichever is easiest (about $25). Covered by our money-back promise.</p>
-    <div class="pay">
-      <a class="ghost" data-link="wise" href="#" target="_blank" rel="noopener">Pay with Wise</a>
-      <a class="ghost" data-link="revolut" href="#" target="_blank" rel="noopener">Pay with Revolut</a>
-      <a class="ghost" data-link="cash" href="#" target="_blank" rel="noopener">Pay cash</a>
-    </div>
-    <p class="small">Paying cash? Tap the button and message Brother Fawad on WhatsApp to arrange it.</p>
-    <button class="btn ov-go" type="button" id="paidBtn">I've paid, continue</button>
-    <p class="small" style="margin:14px 0 0">Not you? <button class="ov-link" type="button" id="notYou">Start again</button></p>
-  </div>
-</div>
-
-<!-- RESERVE FLOW: step 3 (video + form) -->
+<!-- RESERVE FLOW: step 2 (video + form) -->
 <div class="ov" id="surveyOv" role="dialog" aria-modal="true" aria-labelledby="surveyTitle" tabindex="-1">
   <div class="ov-card wide">
     <button class="ov-x" type="button" data-close="surveyOv" aria-label="Close">&times;</button>
-    <p class="label">Step 3 of 3</p>
+    <p class="label">Step 2 of 3</p>
     <h2 id="surveyTitle">Your registration is almost complete&hellip;</h2>
     <p>Watch the video below to finish your registration and fill out the form to gain access to the WhatsApp Group!</p>
     <div class="vid2" id="vid2" hidden><div class="frame" id="vsl2"></div></div>
     <div class="ov-survey" id="surveyHost"></div>
+    <p class="small" style="margin:14px 0 0">Finished the form? <button class="ov-link" type="button" id="toPay">Continue to payment</button></p>
+  </div>
+</div>
+
+<!-- RESERVE FLOW: step 3 (payment) -->
+<div class="ov" id="payOv" role="dialog" aria-modal="true" aria-labelledby="payTitle" tabindex="-1">
+  <div class="ov-card">
+    <button class="ov-x" type="button" data-close="payOv" aria-label="Close">&times;</button>
+    <div id="payMain">
+      <p class="label">Step 3 of 3</p>
+      <h2 id="payTitle">Last step: pay 250 MAD to confirm your seat</h2>
+      <p>Thank you<span id="payName"></span>. Your form is in. Pay 250 MAD (about $25) to save your spot. Choose whichever is easiest. Covered by our money-back promise.</p>
+      <div class="pay">
+        <a class="ghost" data-link="wise" href="#" target="_blank" rel="noopener">Pay with Wise</a>
+        <a class="ghost" data-link="revolut" href="#" target="_blank" rel="noopener">Pay with Revolut</a>
+        <a class="ghost" data-link="cash" href="#" target="_blank" rel="noopener">Pay cash</a>
+      </div>
+      <p class="small">Paying cash? Tap the button and message Brother Fawad on WhatsApp to arrange it.</p>
+      <button class="btn ov-go" type="button" id="paidBtn">I've paid</button>
+      <p class="small" style="margin:14px 0 0">Not you? <button class="ov-link" type="button" id="notYou">Start again</button></p>
+    </div>
+    <div id="payDone" hidden>
+      <h2>JazakAllahu khair.</h2>
+      <p>Once your payment is in, Brother Fawad will confirm your seat on WhatsApp, add you to the group and send the venue details.</p>
+      <button class="btn ov-go" type="button" data-close="payOv">Close</button>
+    </div>
+    <div id="payNo" hidden>
+      <h2>No problem.</h2>
+      <p>Thank you for filling in the form. If anything changes, <a data-link="whatsapp" href="#" target="_blank" rel="noopener" style="text-decoration:underline">message us on WhatsApp</a> and you'll be first to hear about the next one, inshaAllah.</p>
+      <button class="btn ov-go" type="button" data-close="payOv">Close</button>
+    </div>
   </div>
 </div>
 
@@ -763,11 +782,13 @@ const CONFIG = {
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  // ---- Reserve flow: lead popup -> payment -> video + form ----
-  const LEAD_KEY = "tbm_lead";
+  // ---- Reserve flow: lead popup -> video + form -> payment ----
+  const LEAD_KEY = "tbm_lead", STAGE_KEY = "tbm_stage";
   const getLead = () => { try { return JSON.parse(localStorage.getItem(LEAD_KEY)) || null; } catch (e) { return null; } };
   const setLead = (l) => { try { localStorage.setItem(LEAD_KEY, JSON.stringify(l)); } catch (e) {} };
-  const clearLead = () => { try { localStorage.removeItem(LEAD_KEY); } catch (e) {} };
+  const getStage = () => { try { return localStorage.getItem(STAGE_KEY) || "form"; } catch (e) { return "form"; } };
+  const setStage = (v) => { try { localStorage.setItem(STAGE_KEY, v); } catch (e) {} };
+  const clearLead = () => { try { localStorage.removeItem(LEAD_KEY); localStorage.removeItem(STAGE_KEY); } catch (e) {} };
   const payOv = document.getElementById("payOv");
   const surveyOv = document.getElementById("surveyOv");
   let surveyBuiltFor = null;
@@ -783,7 +804,7 @@ const CONFIG = {
     if (typeof v === "object") return str(v.value != null ? v.value : v.number != null ? v.number : v.text != null ? v.text : Object.values(v)[0]);
     return String(v);
   };
-  // Reads the answers Tally sends when the lead form is submitted
+  // Reads the answers Tally sends when the short lead form is submitted
   const parseLead = (payload) => {
     const lead = { name: "", email: "", phone: "", id: "" };
     if (!payload) return lead;
@@ -798,11 +819,25 @@ const CONFIG = {
     });
     return lead;
   };
+  // Text of a multiple-choice answer (Tally may send option ids or the text itself)
+  const answerText = (f) => {
+    const v = f.value != null ? f.value : f.answer;
+    if (Array.isArray(v) && Array.isArray(f.options)) {
+      return v.map(id => { const o = f.options.find(o => o && (o.id === id || o.uuid === id)); return o ? str(o.text || o.name || o.label) : str(id); }).join(", ");
+    }
+    return str(v);
+  };
 
-  const showPay = () => {
+  // mode: "pay" (buttons), "done" (after "I've paid"), "no" (said they can't come)
+  const showPay = (mode) => {
+    mode = mode || "pay";
     const lead = getLead() || {};
     const first = (lead.name || "").trim().split(/\s+/)[0];
     document.getElementById("payName").textContent = first ? ", " + first : "";
+    document.getElementById("payMain").hidden = mode !== "pay";
+    document.getElementById("payDone").hidden = mode !== "done";
+    document.getElementById("payNo").hidden = mode !== "no";
+    closeOv(surveyOv);
     openOv(payOv);
   };
 
@@ -836,13 +871,34 @@ const CONFIG = {
     if (!window.Tally) { window.open("https://tally.so/r/" + CONFIG.leadFormId, "_blank", "noopener"); return; }
     Tally.openPopup(CONFIG.leadFormId, {
       layout: "modal", width: 520, hideTitle: true, overlay: true,
-      onSubmit: (payload) => { setLead(parseLead(payload)); Tally.closePopup(CONFIG.leadFormId); showPay(); }
+      onSubmit: (payload) => { setLead(parseLead(payload)); setStage("form"); Tally.closePopup(CONFIG.leadFormId); showSurvey(); }
     });
   };
 
-  const startReserve = () => { if (getLead()) showPay(); else openLead(); };
+  // Where each visitor is: no details yet -> short form; details but no payment -> video + form; then payment
+  const startReserve = () => {
+    if (!getLead()) { openLead(); return; }
+    const stage = getStage();
+    if (stage === "pay" || stage === "done") showPay(stage); else showSurvey();
+  };
   document.querySelectorAll('a.btn[href="#book"]').forEach(a => a.addEventListener("click", (e) => { e.preventDefault(); startReserve(); }));
-  document.getElementById("paidBtn").addEventListener("click", showSurvey);
+
+  // When the big form is submitted, move on to payment (or say no problem if they can't come)
+  window.addEventListener("message", (e) => {
+    if (e.origin !== "https://tally.so") return;
+    const d = e.data;
+    if (typeof d !== "string" || d.indexOf("Tally.FormSubmitted") === -1) return;
+    let payload = {};
+    try { payload = JSON.parse(d).payload || {}; } catch (err) {}
+    const fid = payload.formId;
+    if (fid ? fid !== CONFIG.surveyFormId : !surveyOv.classList.contains("open")) return;
+    const seat = (payload.fields || []).find(f => /seat/i.test(str(f.label || f.title)));
+    const declined = !!seat && /can.t make|not for now/i.test(answerText(seat));
+    setStage(declined ? "form" : "pay");
+    setTimeout(() => showPay(declined ? "no" : "pay"), 700);
+  });
+  document.getElementById("toPay").addEventListener("click", () => { setStage("pay"); showPay("pay"); });
+  document.getElementById("paidBtn").addEventListener("click", () => { setStage("done"); showPay("done"); });
   document.getElementById("notYou").addEventListener("click", () => { clearLead(); surveyBuiltFor = null; closeOv(payOv); openLead(); });
 })();
 </script>
