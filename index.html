@@ -653,7 +653,7 @@ a[data-link="whatsapp"]:not(.ghost):not(.btn){display:inline-block}
 <!-- RESERVE FLOW: step 3 (payment) -->
 <div class="ov" id="payOv" role="dialog" aria-modal="true" aria-labelledby="payTitle" tabindex="-1">
   <div class="ov-card">
-    <button class="ov-x" type="button" data-close="payOv" aria-label="Close">&times;</button>
+    <button class="ov-x" type="button" id="payClose" data-close="payOv" aria-label="Close" hidden>&times;</button>
     <div id="payMain">
       <p class="small" style="margin:0 0 6px">JazakAllahu khair<span id="payName"></span>.</p>
       <h2 id="payTitle">Wait — your registration isn't complete yet.</h2>
@@ -707,8 +707,8 @@ const CONFIG = {
   const links = {
     wise: CONFIG.wiseUrl,
     revolut: CONFIG.revolutUrl,
-    cash: wa("Salaam, I'd like to pay cash for the Tetouan Business Mastermind on 10 October."),
-    whatsapp: wa("Salaam, I have a question about the Tetouan Business Mastermind.")
+    cash: wa("Assalamu alaikum, I'd like to pay cash for the Tetouan Business Mastermind on 10 October."),
+    whatsapp: wa("Assalamu alaikum, I have a question about the Tetouan Business Mastermind.")
   };
   document.querySelectorAll("[data-link]").forEach(a => { a.href = links[a.dataset.link] || "#"; });
   // hide a payment button until its real link has been pasted in
@@ -799,7 +799,10 @@ const CONFIG = {
   const setLead = (l) => { try { localStorage.setItem(LEAD_KEY, JSON.stringify(l)); } catch (e) {} };
   const getStage = () => { try { return localStorage.getItem(STAGE_KEY) || "form"; } catch (e) { return "form"; } };
   const setStage = (v) => { try { localStorage.setItem(STAGE_KEY, v); } catch (e) {} };
-  const clearLead = () => { try { localStorage.removeItem(LEAD_KEY); localStorage.removeItem(STAGE_KEY); } catch (e) {} };
+  const clearLead = () => { try { localStorage.removeItem(LEAD_KEY); localStorage.removeItem(STAGE_KEY); localStorage.removeItem(LOCK_KEY); } catch (e) {} };
+  const LOCK_KEY = "tbm_pay_lock", LOCK_MS = 30 * 1000; // can't X out of payment for the first 30 seconds
+  const getLockUntil = () => { try { return parseInt(localStorage.getItem(LOCK_KEY), 10) || 0; } catch (e) { return 0; } };
+  const ensureLock = () => { try { if (!localStorage.getItem(LOCK_KEY)) localStorage.setItem(LOCK_KEY, String(Date.now() + LOCK_MS)); } catch (e) {} };
   const leadOv = document.getElementById("leadOv");
   const payOv = document.getElementById("payOv");
   const surveyOv = document.getElementById("surveyOv");
@@ -807,7 +810,12 @@ const CONFIG = {
   let surveyBuiltFor = null;
 
   const openOv = (el) => { el.classList.add("open"); document.body.classList.add("noscroll"); el.scrollTop = 0; el.focus({ preventScroll: true }); };
-  const closeOv = (el) => { el.classList.remove("open"); if (!document.querySelector(".ov.open")) document.body.classList.remove("noscroll"); };
+  const closeOv = (el) => {
+    // Sticky for the first 2 minutes on the payment screen only
+    if (el === payOv && !document.getElementById("payMain").hidden && Date.now() < getLockUntil()) return;
+    el.classList.remove("open");
+    if (!document.querySelector(".ov.open")) document.body.classList.remove("noscroll");
+  };
   document.querySelectorAll("[data-close]").forEach(b => b.addEventListener("click", () => closeOv(document.getElementById(b.dataset.close))));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") document.querySelectorAll(".ov.open").forEach(closeOv); });
 
@@ -841,6 +849,7 @@ const CONFIG = {
     return str(v);
   };
 
+  let lockTimer = null;
   // mode: "pay" (buttons), "done" (after "I've paid"), "no" (said they can't come)
   const showPay = (mode) => {
     mode = mode || "pay";
@@ -850,6 +859,16 @@ const CONFIG = {
     document.getElementById("payMain").hidden = mode !== "pay";
     document.getElementById("payDone").hidden = mode !== "done";
     document.getElementById("payNo").hidden = mode !== "no";
+    const payClose = document.getElementById("payClose");
+    if (lockTimer) { clearTimeout(lockTimer); lockTimer = null; }
+    if (mode === "pay") {
+      ensureLock();
+      const msLeft = getLockUntil() - Date.now();
+      payClose.hidden = msLeft > 0;
+      if (msLeft > 0) lockTimer = setTimeout(() => { payClose.hidden = false; }, msLeft);
+    } else {
+      payClose.hidden = false;
+    }
     closeOv(surveyOv);
     openOv(payOv);
   };
@@ -921,13 +940,11 @@ const CONFIG = {
       return;
     }
 
-    // Step 2 (the big form) just submitted
+    // Step 2 (the big form) just submitted — always go to payment and stay there
     if (fid && fid !== CONFIG.surveyFormId) return;
     if (!fid && !surveyOv.classList.contains("open")) return;
-    const seat = (payload.fields || []).find(f => /seat/i.test(str(f.label || f.title)));
-    const declined = !!seat && /can.t make|not for now/i.test(answerText(seat));
-    setStage(declined ? "form" : "pay");
-    setTimeout(() => showPay(declined ? "no" : "pay"), 700);
+    setStage("pay");
+    setTimeout(() => showPay("pay"), 700);
   });
 
   document.getElementById("paidBtn").addEventListener("click", () => { setStage("done"); showPay("done"); });
@@ -936,6 +953,10 @@ const CONFIG = {
     document.getElementById("leadHost").innerHTML = "";
     closeOv(payOv); openLead();
   });
+
+  // Returning visitor who filled in the form but hasn't paid yet: show payment
+  // automatically on page load, not just when they tap "Reserve your seat" again
+  if (getLead() && getStage() === "pay") { setTimeout(() => showPay("pay"), 400); }
 })();
 </script>
 </body>
