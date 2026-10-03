@@ -635,7 +635,7 @@ a[data-link="whatsapp"]:not(.ghost):not(.btn){display:inline-block}
     <p>Watch the video below to finish your registration and fill out the form to gain access to the WhatsApp Group!</p>
     <div class="vid2" id="vid2" hidden><div class="frame" id="vsl2"></div></div>
     <div class="ov-survey" id="surveyHost"></div>
-    <p class="small" style="margin:14px 0 0">Finished the form? <button class="ov-link" type="button" id="toPay">Continue to payment</button></p>
+    <button class="btn ov-go" type="button" id="toPay" style="margin-top:14px;width:100%">Finished the form? Continue to payment</button>
   </div>
 </div>
 
@@ -885,13 +885,14 @@ const CONFIG = {
 
   // When the big form is submitted, move on to payment (or say no problem if they can't come)
   window.addEventListener("message", (e) => {
-    if (e.origin !== "https://tally.so") return;
+    if (!/tally\.so$/.test(e.origin.replace(/^https?:\/\//, ""))) return;
     const d = e.data;
     if (typeof d !== "string" || d.indexOf("Tally.FormSubmitted") === -1) return;
     let payload = {};
     try { payload = JSON.parse(d).payload || {}; } catch (err) {}
     const fid = payload.formId;
-    if (fid ? fid !== CONFIG.surveyFormId : !surveyOv.classList.contains("open")) return;
+    if (fid && fid !== CONFIG.surveyFormId) return;
+    if (!fid && !surveyOv.classList.contains("open")) return;
     const seat = (payload.fields || []).find(f => /seat/i.test(str(f.label || f.title)));
     const declined = !!seat && /can.t make|not for now/i.test(answerText(seat));
     setStage(declined ? "form" : "pay");
