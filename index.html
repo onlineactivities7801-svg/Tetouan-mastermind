@@ -626,6 +626,17 @@ a[data-link="whatsapp"]:not(.ghost):not(.btn){display:inline-block}
 <div class="sticky" id="sticky"><a class="btn" href="#book">Reserve your seat · 250 MAD</a></div>
 
 
+<!-- RESERVE FLOW: step 1 (name, email, WhatsApp) -->
+<div class="ov" id="leadOv" role="dialog" aria-modal="true" aria-labelledby="leadTitle" tabindex="-1">
+  <div class="ov-card">
+    <button class="ov-x" type="button" data-close="leadOv" aria-label="Close">&times;</button>
+    <p class="label">Step 1 of 3</p>
+    <h2 id="leadTitle">Reserve your seat</h2>
+    <p>Tell us your name, email and WhatsApp number. It takes 30 seconds.</p>
+    <div class="ov-survey" id="leadHost"></div>
+  </div>
+</div>
+
 <!-- RESERVE FLOW: step 2 (video + form) -->
 <div class="ov" id="surveyOv" role="dialog" aria-modal="true" aria-labelledby="surveyTitle" tabindex="-1">
   <div class="ov-card wide">
@@ -635,7 +646,7 @@ a[data-link="whatsapp"]:not(.ghost):not(.btn){display:inline-block}
     <p>Watch the video below to finish your registration and fill out the form to gain access to the WhatsApp Group!</p>
     <div class="vid2" id="vid2" hidden><div class="frame" id="vsl2"></div></div>
     <div class="ov-survey" id="surveyHost"></div>
-    <button class="btn ov-go" type="button" id="toPay" style="margin-top:14px;width:100%">Finished the form? Continue to payment</button>
+
   </div>
 </div>
 
@@ -644,9 +655,9 @@ a[data-link="whatsapp"]:not(.ghost):not(.btn){display:inline-block}
   <div class="ov-card">
     <button class="ov-x" type="button" data-close="payOv" aria-label="Close">&times;</button>
     <div id="payMain">
-      <p class="label">Step 3 of 3</p>
-      <h2 id="payTitle">Last step: pay 250 MAD to confirm your seat</h2>
-      <p>Thank you<span id="payName"></span>. Your form is in. Pay 250 MAD (about $25) to save your spot. Choose whichever is easiest. Covered by our money-back promise.</p>
+      <p class="small" style="margin:0 0 6px">JazakAllahu khair<span id="payName"></span>.</p>
+      <h2 id="payTitle">Wait — your registration isn't complete yet.</h2>
+      <p>Please proceed with your payment of 250 MAD now to secure your seat. Choose whichever is easiest below. Covered by our money-back promise.</p>
       <div class="pay">
         <a class="ghost" data-link="wise" href="#" target="_blank" rel="noopener">Pay with Wise</a>
         <a class="ghost" data-link="revolut" href="#" target="_blank" rel="noopener">Pay with Revolut</a>
@@ -782,15 +793,17 @@ const CONFIG = {
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  // ---- Reserve flow: lead popup -> video + form -> payment ----
+  // ---- Reserve flow: lead form -> video + form -> payment ----
   const LEAD_KEY = "tbm_lead", STAGE_KEY = "tbm_stage";
   const getLead = () => { try { return JSON.parse(localStorage.getItem(LEAD_KEY)) || null; } catch (e) { return null; } };
   const setLead = (l) => { try { localStorage.setItem(LEAD_KEY, JSON.stringify(l)); } catch (e) {} };
   const getStage = () => { try { return localStorage.getItem(STAGE_KEY) || "form"; } catch (e) { return "form"; } };
   const setStage = (v) => { try { localStorage.setItem(STAGE_KEY, v); } catch (e) {} };
   const clearLead = () => { try { localStorage.removeItem(LEAD_KEY); localStorage.removeItem(STAGE_KEY); } catch (e) {} };
+  const leadOv = document.getElementById("leadOv");
   const payOv = document.getElementById("payOv");
   const surveyOv = document.getElementById("surveyOv");
+  let leadBuilt = false;
   let surveyBuiltFor = null;
 
   const openOv = (el) => { el.classList.add("open"); document.body.classList.add("noscroll"); el.scrollTop = 0; el.focus({ preventScroll: true }); };
@@ -867,13 +880,21 @@ const CONFIG = {
 
   const showSurvey = () => { closeOv(payOv); buildSurvey(); openOv(surveyOv); };
 
-  const openLead = () => {
-    if (!window.Tally) { window.open("https://tally.so/r/" + CONFIG.leadFormId, "_blank", "noopener"); return; }
-    Tally.openPopup(CONFIG.leadFormId, {
-      layout: "modal", width: 520, hideTitle: true, overlay: true,
-      onSubmit: (payload) => { setLead(parseLead(payload)); setStage("form"); Tally.closePopup(CONFIG.leadFormId); showSurvey(); }
-    });
+  const buildLead = () => {
+    if (leadBuilt) return;
+    leadBuilt = true;
+    const q = new URLSearchParams({ alignLeft: "1", hideTitle: "1", transparentBackground: "1", dynamicHeight: "1" });
+    const host = document.getElementById("leadHost");
+    const f = document.createElement("iframe");
+    f.setAttribute("data-tally-src", "https://tally.so/embed/" + CONFIG.leadFormId + "?" + q.toString());
+    f.title = "Reserve your seat";
+    f.loading = "lazy";
+    f.width = "100%"; f.height = "300";
+    host.appendChild(f);
+    if (window.Tally && Tally.loadEmbeds) Tally.loadEmbeds(); else f.src = f.getAttribute("data-tally-src");
   };
+
+  const openLead = () => { buildLead(); openOv(leadOv); };
 
   // Where each visitor is: no details yet -> short form; details but no payment -> video + form; then payment
   const startReserve = () => {
@@ -883,7 +904,7 @@ const CONFIG = {
   };
   document.querySelectorAll('a.btn[href="#book"]').forEach(a => a.addEventListener("click", (e) => { e.preventDefault(); startReserve(); }));
 
-  // When the big form is submitted, move on to payment (or say no problem if they can't come)
+  // When a form is submitted: lead form -> move to video+form; big form -> move to payment
   window.addEventListener("message", (e) => {
     if (!/tally\.so$/.test(e.origin.replace(/^https?:\/\//, ""))) return;
     const d = e.data;
@@ -891,6 +912,16 @@ const CONFIG = {
     let payload = {};
     try { payload = JSON.parse(d).payload || {}; } catch (err) {}
     const fid = payload.formId;
+
+    // Step 1 (name/email/WhatsApp) just submitted
+    if (fid === CONFIG.leadFormId || (!fid && leadOv.classList.contains("open"))) {
+      setLead(parseLead(payload));
+      setStage("form");
+      showSurvey();
+      return;
+    }
+
+    // Step 2 (the big form) just submitted
     if (fid && fid !== CONFIG.surveyFormId) return;
     if (!fid && !surveyOv.classList.contains("open")) return;
     const seat = (payload.fields || []).find(f => /seat/i.test(str(f.label || f.title)));
@@ -898,9 +929,13 @@ const CONFIG = {
     setStage(declined ? "form" : "pay");
     setTimeout(() => showPay(declined ? "no" : "pay"), 700);
   });
-  document.getElementById("toPay").addEventListener("click", () => { setStage("pay"); showPay("pay"); });
+
   document.getElementById("paidBtn").addEventListener("click", () => { setStage("done"); showPay("done"); });
-  document.getElementById("notYou").addEventListener("click", () => { clearLead(); surveyBuiltFor = null; closeOv(payOv); openLead(); });
+  document.getElementById("notYou").addEventListener("click", () => {
+    clearLead(); surveyBuiltFor = null; leadBuilt = false;
+    document.getElementById("leadHost").innerHTML = "";
+    closeOv(payOv); openLead();
+  });
 })();
 </script>
 </body>
